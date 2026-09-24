@@ -1,0 +1,41 @@
+compile:
+
+1. Intel Fortran:
+
+# load Intel IFX environment
+
+# debug:
+ifx *.f90 -O0 -xHost -r8 -fpp -g -traceback -no-wrap-margin -fpe0 -check all -init=arrays -init=snan -o main.exe -qopenmp -qmkl=sequential
+
+# release:
+ifx *.f90 -O3 -xHost -r8 -fpp -g -traceback -no-wrap-margin -o main.exe -qopenmp -qmkl=sequential #注意！IFX链接
+
+
+2. Gfortran:
+
+# load Lapack
+
+#debug: 
+gfortran -Og -g -fdefault-real-8 -mtune=native -march=native -m64 -fbacktrace -Wimplicit-interface -Wimplicit-procedure -ffpe-trap=zero,invalid,overflow -finit-real=nan -fcheck=all -ffree-line-length-none -cpp *.f90 -o main.exe -fopenmp -llapack
+
+#release: 
+gfortran -O3 -g -fdefault-real-8 -mtune=native -march=native -m64 -fbacktrace -ffree-line-length-none -cpp *.f90 -o main.exe -fopenmp -llapack
+
+
+3. CMAKE+IFX:
+
+# setup Intel compiler environment
+cd build
+rm -r *
+export FC=ifx # If not provided, CMake will try to find a Fortran compiler itself.
+cmake -DCMAKE_BUILD_TYPE=Release .. # configure (or Debug if needed)
+cmake --build . --verbose # compile (add --verbose to see the actual compiler commands) (or just 'make')
+
+
+4. CMAKE+Gfortran:
+
+cd build
+rm -r *
+export FC=gfortran # If not provided, CMake will try to find a Fortran compiler itself.
+cmake -DCMAKE_BUILD_TYPE=Release .. # configure (or Debug if needed)
+cmake --build . --verbose # compile (add --verbose to see the actual compiler commands) (or just 'make')
